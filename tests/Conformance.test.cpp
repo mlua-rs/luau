@@ -1647,7 +1647,7 @@ TEST_CASE("Reference")
     lua_newuserdatadtor(
         L,
         0,
-        [](void*)
+        [](lua_State*, void* data)
         {
             dtorhits++;
         }
@@ -1655,7 +1655,7 @@ TEST_CASE("Reference")
     lua_newuserdatadtor(
         L,
         0,
-        [](void*)
+        [](lua_State*, void* data)
         {
             dtorhits++;
         }
@@ -1693,7 +1693,7 @@ TEST_CASE("NewUserdataOverflow")
         [](lua_State* L1)
         {
             // The following userdata request might cause an overflow.
-            lua_newuserdatadtor(L1, SIZE_MAX, [](void* d) {});
+            lua_newuserdatadtor(L1, SIZE_MAX, [](lua_State*, void* d) {});
             // The overflow might segfault in the following call.
             lua_getmetatable(L1, -1);
             return 0;
@@ -2624,7 +2624,7 @@ TEST_CASE("UserdataApi")
     void* ud3 = lua_newuserdatadtor(
         L,
         4,
-        [](void* data)
+        [](lua_State*, void* data)
         {
             dtorhits += *(int*)data;
         }
@@ -2633,7 +2633,7 @@ TEST_CASE("UserdataApi")
     void* ud4 = lua_newuserdatadtor(
         L,
         1,
-        [](void* data)
+        [](lua_State*, void* data)
         {
             dtorhits += *(char*)data;
         }
@@ -2713,7 +2713,7 @@ TEST_CASE("UserdataAlignment")
 
         for (int i = 0; i < 10; i++)
         {
-            void* data = lua_newuserdatadtor(L, size, [](void*) {});
+            void* data = lua_newuserdatadtor(L, size, [](lua_State*, void* data) {});
             LUAU_ASSERT(uintptr_t(data) % 16 == 0);
             lua_pop(L, 1);
         }
